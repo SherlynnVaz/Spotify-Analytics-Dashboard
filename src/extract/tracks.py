@@ -1,6 +1,7 @@
 import pandas as pd
 from pathlib import Path
 
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 RAW_FOLDER = PROJECT_ROOT / "data" / "raw"
 
@@ -28,37 +29,45 @@ def extract_top_tracks(sp):
 
         rows.append({
 
-            "Track ID": track["id"],
+    "Track ID": track["id"],
 
-            "Track Name": track["name"],
+    "Track Name": track["name"],
 
-            "Album ID": track["album"].get("id", ""),
+    "Album ID": track["album"].get("id", ""),
 
-            "Album": track["album"]["name"],
+    "Album": track["album"]["name"],
 
-            "Artist IDs": ",".join(
-                artist["id"]
-                for artist in track["artists"]
-            ),
+    "Album Type": track["album"].get("album_type", ""),
 
-            "Artists": ", ".join(
-                artist["name"]
-                for artist in track["artists"]
-            ),
+    "Release Date": track["album"].get("release_date", ""),
 
-            "Duration_ms": track["duration_ms"],
+    "Popularity": track.get("popularity", 0),
 
-            "Explicit": track["explicit"],
+    "Artist IDs": ",".join(
+        artist["id"]
+        for artist in track["artists"]
+    ),
 
-            "Track Number": track["track_number"],
+    "Artists": ", ".join(
+        artist["name"]
+        for artist in track["artists"]
+    ),
 
-            "Disc Number": track["disc_number"],
+    "Duration_ms": track["duration_ms"],
 
-            "Preview URL": track.get("preview_url", ""),
+    "Explicit": track["explicit"],
 
-            "Spotify URL": track["external_urls"].get("spotify", ""),
+    "Track Number": track["track_number"],
 
-        })
+    "Disc Number": track["disc_number"],
+
+    "Preview URL": track.get("preview_url", ""),
+
+    "Spotify URL": track["external_urls"].get("spotify", ""),
+    "URI": track.get("uri", ""),
+    "Is Local": track.get("is_local", False),
+
+})
 
     df = pd.DataFrame(rows)
 
