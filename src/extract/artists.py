@@ -42,4 +42,6 @@ def extract_top_artists(sp):
 
     save_csv(df, "top_artists.csv")
 
+    print("✓ Top Artists extracted")
+
     return df

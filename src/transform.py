@@ -44,6 +44,8 @@ def transform_tracks():
 
     print("Saved top_tracks_clean.csv")
 
+    print("✓ Top Tracks transformed")
+
     return df
 
 def transform_artists():
@@ -63,6 +65,8 @@ def transform_artists():
     )
 
     print("Saved top_artists_clean.csv")
+
+    print("✓ Top Artists transformed")
 
     return df
 
@@ -97,6 +101,8 @@ def transform_playlists():
     )
 
     print("Saved top_playlists_clean.csv")
+
+    print("✓ Playlists transformed")
 
     return df
 
@@ -137,6 +143,8 @@ def transform_recently_played():
     )
 
     print("Saved recently_played_clean.csv")
+
+    print("✓ Recently Played transformed")
 
     return df
 

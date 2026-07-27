@@ -22,6 +22,7 @@ def extract_playlists(sp):
 
     playlist_rows = []
     playlist_track_rows = []
+    skipped = 0
 
     for playlist in playlists["items"]:
 
@@ -40,7 +41,7 @@ def extract_playlists(sp):
             results = sp.playlist_tracks(playlist["id"])
         except SpotifyException as error:
             if error.http_status == 403:
-                print(f"Skipping playlist {playlist.get('name', playlist['id'])}: access forbidden")
+                skipped += 1
                 continue
             raise
 
@@ -62,5 +63,7 @@ def extract_playlists(sp):
 
     save_csv(playlists_df, "playlists.csv")
     save_csv(playlist_tracks_df, "playlist_tracks.csv")
+
+    print(f"✓ Playlist extraction completed ({skipped} inaccessible playlists skipped)")
 
     return playlists_df, playlist_tracks_df

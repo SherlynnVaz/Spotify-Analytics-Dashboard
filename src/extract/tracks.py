@@ -73,4 +73,6 @@ def extract_top_tracks(sp):
 
     save_csv(df, "top_tracks.csv")
 
+    print("✓ Top Tracks extracted")
+
     return df

@@ -39,4 +39,6 @@ def extract_recently_played(sp):
 
     save_csv(df, "recently_played.csv")
 
+    print("✓ Recently Played extracted")
+
     return df
