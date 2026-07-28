@@ -16,6 +16,7 @@ def transform_tracks():
     df = df.drop_duplicates()
     df = df.dropna(subset=["Track Name"])
 
+
     df["Duration (Minutes)"] = (
         df["Duration_ms"] / 60000
     ).round(2)
@@ -29,6 +30,25 @@ def transform_tracks():
     )
 
     df["Release Year"] = df["Release Date"].dt.year
+
+    df["Release Decade"] = (df["Release Year"] // 10) * 10
+    df["Duration Bucket"] = pd.cut(
+    df["Duration (Minutes)"],
+    bins=[0, 2, 3, 4, 5, 100],
+    labels=["<2 min", "2-3 min", "3-4 min", "4-5 min", "5+ min"]
+)
+
+    df.drop(
+    columns=[
+        "Duration_ms",
+        "URI",
+        "Is Local",
+        "Preview URL",
+        "Disc Number",
+        "Track Number"
+    ],
+    inplace=True
+)
 
     df = df.sort_values(
         by="Popularity",
@@ -59,10 +79,19 @@ def transform_artists():
     by="Popularity",
     ascending=False)
     df.reset_index(drop=True, inplace=True)
+    df.drop(
+    columns=[
+        "Followers",
+        "Genres",
+        "Popularity"
+    ],
+    inplace=True)
+
     df.to_csv(
     PROCESSED_FOLDER / "top_artists_clean.csv",
     index=False
     )
+
 
     print("Saved top_artists_clean.csv")
 
@@ -94,6 +123,13 @@ def transform_playlists():
     # Reset index
     df.reset_index(drop=True, inplace=True)
 
+    df.drop(
+    columns=[
+        "Collaborative"
+    ],
+    inplace=True
+    )
+
     # Save cleaned file
     df.to_csv(
         PROCESSED_FOLDER / "top_playlists_clean.csv",
@@ -117,6 +153,18 @@ def transform_recently_played():
 
     # Remove rows without a track name
     df = df.dropna(subset=["Track Name"])
+
+    df["Hour Played"] = df["Played At"].dt.hour
+    df["Day Name"] = df["Played At"].dt.day_name()
+    df["Weekday Number"] = df["Played At"].dt.weekday + 1
+
+    df.drop(
+    columns=[
+        "Popularity",
+        "Preview URL"
+    ],
+    inplace=True
+)
 
     # Convert duration to minutes
     df["Duration (Minutes)"] = (

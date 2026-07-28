@@ -19,7 +19,10 @@ def extract_top_artists(sp):
 
     results = sp.current_user_top_artists(limit=50)
 
+    save_csv(df, "top_artists.csv")
+
     rows = []
+
 
     for artist in results["items"]:
 
@@ -37,10 +40,6 @@ def extract_top_artists(sp):
             "Spotify URL": artist.get("external_urls", {}).get("spotify", ""),
             "Image": image
         })
-
-    df = pd.DataFrame(rows)
-
-    save_csv(df, "top_artists.csv")
 
     print("✓ Top Artists extracted")
 
