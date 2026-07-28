@@ -9,15 +9,29 @@ PROCESSED_FOLDER = PROJECT_ROOT / "data" / "processed"
 PROCESSED_FOLDER.mkdir(parents=True, exist_ok=True)
 
 
+def fix_encoding(text):
+    if pd.isna(text):
+        return text
+    try:
+        return text.encode("latin1").decode("utf-8")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return text
+
 def transform_tracks():
     print("Transforming Top Tracks...")
 
     df = pd.read_csv(RAW_FOLDER / "top_tracks.csv")
 
+    # Remove duplicates and invalid rows
     df = df.drop_duplicates()
     df = df.dropna(subset=["Track Name"])
 
-    # Duration
+    # Fix encoding
+    df["Track Name"] = df["Track Name"].apply(fix_encoding)
+    df["Album"] = df["Album"].apply(fix_encoding)
+    df["Artists"] = df["Artists"].apply(fix_encoding)
+
+    # Convert duration
     df["Duration (Minutes)"] = (df["Duration_ms"] / 60000).round(2)
 
     # Release Date
@@ -32,10 +46,10 @@ def transform_tracks():
         df["Release Year"] // 10
     ) * 10
 
-    # Duration Bucket
+    # Duration Buckets
     df["Duration Bucket"] = pd.cut(
         df["Duration (Minutes)"],
-        bins=[0, 2, 3, 4, 5, float("inf")],
+        bins=[0, 2, 3, 4, 5, 100],
         labels=[
             "<2 min",
             "2-3 min",
@@ -55,15 +69,14 @@ def transform_tracks():
             "Disc Number",
             "Track Number"
         ],
-        inplace=True,
-        errors="ignore"
+        errors="ignore",
+        inplace=True
     )
 
-    if "Popularity" in df.columns:
-        df = df.sort_values(
-            by="Popularity",
-            ascending=False
-        )
+    df = df.sort_values(
+        by="Popularity",
+        ascending=False
+    )
 
     df.reset_index(drop=True, inplace=True)
 
@@ -79,28 +92,23 @@ def transform_tracks():
 
 
 def transform_artists():
-
     print("Transforming Top Artists...")
 
     df = pd.read_csv(RAW_FOLDER / "top_artists.csv")
 
     df = df.drop_duplicates()
     df = df.dropna(subset=["Artist Name"])
+    df["Artist Name"] = df["Artist Name"].apply(fix_encoding)
 
-    if "Popularity" in df.columns:
-        df = df.sort_values(
-            by="Popularity",
-            ascending=False
-        )
-
+    # Remove unusable columns
     df.drop(
         columns=[
             "Followers",
             "Genres",
             "Popularity"
         ],
-        inplace=True,
-        errors="ignore"
+        errors="ignore",
+        inplace=True
     )
 
     df.reset_index(drop=True, inplace=True)
@@ -117,27 +125,31 @@ def transform_artists():
 
 
 def transform_playlists():
-
     print("Transforming Playlists...")
 
     df = pd.read_csv(RAW_FOLDER / "playlists.csv")
 
     df = df.drop_duplicates()
     df = df.dropna(subset=["Playlist Name"])
+    df["Playlist Name"] = df["Playlist Name"].apply(fix_encoding)
+    df["Owner"] = df["Owner"].apply(fix_encoding)
 
-    df["Tracks"] = df["Tracks"].fillna(0).astype(int)
+    df["Tracks"] = (
+        df["Tracks"]
+        .fillna(0)
+        .astype(int)
+    )
+
+    # Remove unnecessary column
+    df.drop(
+        columns=["Collaborative"],
+        errors="ignore",
+        inplace=True
+    )
 
     df = df.sort_values(
         by="Tracks",
         ascending=False
-    )
-
-    df.drop(
-        columns=[
-            "Collaborative"
-        ],
-        inplace=True,
-        errors="ignore"
     )
 
     df.reset_index(drop=True, inplace=True)
@@ -154,7 +166,6 @@ def transform_playlists():
 
 
 def transform_recently_played():
-
     print("Transforming Recently Played...")
 
     df = pd.read_csv(RAW_FOLDER / "recently_played.csv")
@@ -162,18 +173,23 @@ def transform_recently_played():
     df = df.drop_duplicates()
     df = df.dropna(subset=["Track Name"])
 
-    # Convert Played At FIRST
+    # Fix encoding
+    df["Track Name"] = df["Track Name"].apply(fix_encoding)
+    df["Artist"] = df["Artist"].apply(fix_encoding)
+    df["Album"] = df["Album"].apply(fix_encoding)
+
+    # Convert Played At
     df["Played At"] = pd.to_datetime(
         df["Played At"],
         errors="coerce"
     )
 
-    # Analysis columns
+    # Create useful columns
+    df["Played Date"] = df["Played At"].dt.date
+    df["Played Time"] = df["Played At"].dt.strftime("%H:%M:%S")
     df["Hour Played"] = df["Played At"].dt.hour
-    df["Day Name"] = df["Played At"].dt.day_name()
-    df["Weekday Number"] = df["Played At"].dt.weekday + 1
 
-    # Duration
+    # Convert duration
     df["Duration (Minutes)"] = (
         df["Duration_ms"] / 60000
     ).round(2)
@@ -181,16 +197,19 @@ def transform_recently_played():
     # Remove unnecessary columns
     df.drop(
         columns=[
+            "Played At",
             "Duration_ms",
             "Popularity",
-            "Preview URL"
+            "Preview URL",
+            "Day Name",
+            "Weekday Number"
         ],
-        inplace=True,
-        errors="ignore"
+        errors="ignore",
+        inplace=True
     )
 
     df = df.sort_values(
-        by="Played At",
+        by=["Played Date", "Played Time"],
         ascending=False
     )
 
@@ -205,6 +224,8 @@ def transform_recently_played():
     print("✓ Recently Played transformed")
 
     return df
+
+
 
 
 if __name__ == "__main__":
