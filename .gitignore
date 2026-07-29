@@ -4,9 +4,10 @@ venv/
 # Environment Variables
 .env
 
-# Python Cache
+# Cache
 __pycache__/
 *.pyc
+.cache
 
 # macOS
 .DS_Store
@@ -20,3 +21,4 @@ data/processed/*
 
 # Power BI Auto Recovery
 *.pbix.autorecover
+
