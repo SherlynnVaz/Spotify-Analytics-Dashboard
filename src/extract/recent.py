@@ -6,10 +6,39 @@ RAW_FOLDER = PROJECT_ROOT / "data" / "raw"
 
 RAW_FOLDER.mkdir(parents=True, exist_ok=True)
 
-def save_csv(df, filename):
+def save_csv(df, filename, append=False, duplicate_cols=None):
     path = RAW_FOLDER / filename
-    df.to_csv(path, index=False)
-    print(f"Saved {filename}")
+
+    if append and path.exists():
+        existing_df = pd.read_csv(path)
+
+        # Combine old and new data
+        combined_df = pd.concat([existing_df, df], ignore_index=True)
+
+        # Remove duplicates if columns are provided
+        if duplicate_cols:
+            combined_df = combined_df.drop_duplicates(
+                subset=duplicate_cols,
+                keep="last"
+            )
+
+        # Sort by Played At (latest first) if available
+        if "Played At" in combined_df.columns:
+            combined_df = combined_df.sort_values(
+                by="Played At",
+                ascending=False
+            )
+
+        combined_df.to_csv(path, index=False)
+
+        print(
+            f"Appended {len(df)} rows. "
+            f"Total rows: {len(combined_df)}"
+        )
+
+    else:
+        df.to_csv(path, index=False)
+        print(f"Saved {filename}")
 
 def extract_recently_played(sp):
     print("Extracting Recently Played...")
@@ -37,7 +66,12 @@ def extract_recently_played(sp):
 
     df = pd.DataFrame(rows)
 
-    save_csv(df, "recently_played.csv")
+    save_csv(
+        df,
+        "recently_played.csv",
+        append=True,
+        duplicate_cols=["Track ID", "Played At"]
+    )
 
     print("✓ Recently Played extracted")
 

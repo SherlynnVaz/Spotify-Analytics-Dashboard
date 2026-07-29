@@ -189,6 +189,17 @@ def transform_recently_played():
     df["Played Time"] = df["Played At"].dt.strftime("%H:%M:%S")
     df["Hour Played"] = df["Played At"].dt.hour
 
+    df["Hour Label"] = (
+    df["Played At"]
+      .dt.strftime("%I %p")
+      .str.replace(" 0", " ")
+      .str.lstrip("0")
+)
+    df = df.sort_values(
+    by="Played At",
+    ascending=False
+    ).reset_index(drop=True)
+
     # Convert duration
     df["Duration (Minutes)"] = (
         df["Duration_ms"] / 60000
@@ -208,11 +219,6 @@ def transform_recently_played():
         inplace=True
     )
 
-    df = df.sort_values(
-        by=["Played Date", "Played Time"],
-        ascending=False
-    )
-
     df.reset_index(drop=True, inplace=True)
 
     df.to_csv(
@@ -225,7 +231,48 @@ def transform_recently_played():
 
     return df
 
+def create_track_artist_bridge():
+    print("Creating Track-Artist Bridge...")
 
+    df = pd.read_csv(PROCESSED_FOLDER / "top_tracks_clean.csv")
+
+    bridge_rows = []
+
+    for _, row in df.iterrows():
+
+        track_id = row["Track ID"]
+
+        artist_ids = str(row["Artist IDs"]).split(",")
+        artist_names = str(row["Artists"]).split(",")
+
+        artist_ids = [a.strip() for a in artist_ids]
+        artist_names = [a.strip() for a in artist_names]
+
+        for artist_id, artist_name in zip(artist_ids, artist_names):
+            bridge_rows.append({
+                "Track ID": track_id,
+                "Artist ID": artist_id,
+                "Artist Name": artist_name
+            })
+
+    bridge_df = pd.DataFrame(bridge_rows)
+
+    bridge_df = bridge_df.drop_duplicates()
+
+    bridge_df = bridge_df.sort_values(
+        ["Track ID", "Artist Name"]
+    )
+
+    bridge_df.reset_index(drop=True, inplace=True)
+
+    bridge_df.to_csv(
+        PROCESSED_FOLDER / "bridge_track_artist.csv",
+        index=False
+    )
+
+    print("Saved bridge_track_artist.csv")
+
+    return bridge_df
 
 
 if __name__ == "__main__":
@@ -233,3 +280,4 @@ if __name__ == "__main__":
     transform_artists()
     transform_playlists()
     transform_recently_played()
+    create_track_artist_bridge()
