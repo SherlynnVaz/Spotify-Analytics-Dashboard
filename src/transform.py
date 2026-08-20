@@ -178,27 +178,36 @@ def transform_recently_played():
     df["Artist"] = df["Artist"].apply(fix_encoding)
     df["Album"] = df["Album"].apply(fix_encoding)
 
-    # Convert Played At
+    # ============================================================
+    # CONVERT PLAYED AT FROM UTC TO INDIA STANDARD TIME
+    # ============================================================
+
     df["Played At"] = pd.to_datetime(
         df["Played At"],
-        errors="coerce"
+        errors="coerce",
+        utc=True
     )
 
-    # Create useful columns
+    # Convert UTC → IST
+    df["Played At"] = df["Played At"].dt.tz_convert("Asia/Kolkata")
+
+
+    # ============================================================
+    # CREATE USEFUL DATE/TIME COLUMNS
+    # ============================================================
+
     df["Played Date"] = df["Played At"].dt.date
+
     df["Played Time"] = df["Played At"].dt.strftime("%H:%M:%S")
+
     df["Hour Played"] = df["Played At"].dt.hour
 
     df["Hour Label"] = (
-    df["Played At"]
-      .dt.strftime("%I %p")
-      .str.replace(" 0", " ")
-      .str.lstrip("0")
-)
-    df = df.sort_values(
-    by="Played At",
-    ascending=False
-    ).reset_index(drop=True)
+        df["Played At"]
+        .dt.strftime("%I %p")
+        .str.lstrip("0")
+        .str.strip()
+    )
 
     # Convert duration
     df["Duration (Minutes)"] = (
