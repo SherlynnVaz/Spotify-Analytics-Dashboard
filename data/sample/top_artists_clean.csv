@@ -1,16 +1,16 @@
-Artist ID,Artist Name,Spotify URL,Image
-6KImCVD70vtIoJWnq6nGn3,Harry Styles,https://open.spotify.com/artist/6KImCVD70vtIoJWnq6nGn3,https://i.scdn.co/image/ab6761610000e5ebe309f8c3056a59f20d0968ca
-06HL4z0CvFAxyc27GXpf02,Taylor Swift,https://open.spotify.com/artist/06HL4z0CvFAxyc27GXpf02,https://i.scdn.co/image/ab6761610000e5ebe2e8e7ff002a4afda1c7147e
-1McMsnEElThX1knmY4oliG,Olivia Rodrigo,https://open.spotify.com/artist/1McMsnEElThX1knmY4oliG,https://i.scdn.co/image/ab6761610000e5ebb14eb4dcfd2f3858bed06e44
-4AK6F7OLvEQ5QYCBNiQWHq,One Direction,https://open.spotify.com/artist/4AK6F7OLvEQ5QYCBNiQWHq,https://i.scdn.co/image/5bb443424a1ad71603c43d67f5af1a04da6bb3c8
-1wRPtKGflJrBx9BmLsSwlU,Pritam,https://open.spotify.com/artist/1wRPtKGflJrBx9BmLsSwlU,https://i.scdn.co/image/ab6761610000e5ebcb6926f44f620555ba444fca
-74KM79TiuVKeVCqs8QtB0B,Sabrina Carpenter,https://open.spotify.com/artist/74KM79TiuVKeVCqs8QtB0B,https://i.scdn.co/image/ab6761610000e5eb78e45cfa4697ce3c437cb455
-6Mv8GjQa7LKUGCAqa9qqdb,Vishal-Shekhar,https://open.spotify.com/artist/6Mv8GjQa7LKUGCAqa9qqdb,https://i.scdn.co/image/ab6761610000e5eb90b6c3d093f9b02aad628eaf
-3mIj9lX2MWuHmhNCA7LSCW,The 1975,https://open.spotify.com/artist/3mIj9lX2MWuHmhNCA7LSCW,https://i.scdn.co/image/ab6761610000e5eb0c6e752cbb1e6d1416970f5a
-6qqNVTkY8uBg9cP3Jd7DAH,Billie Eilish,https://open.spotify.com/artist/6qqNVTkY8uBg9cP3Jd7DAH,https://i.scdn.co/image/ab6761610000e5eb4a21b4760d2ecb7b0dcdc8da
-1uNFoZAHBGtllmzznpCI3s,Justin Bieber,https://open.spotify.com/artist/1uNFoZAHBGtllmzznpCI3s,https://i.scdn.co/image/ab6761610000e5ebaf20f7db5288bce9beede034
-66CXWjxzNUsdJxJ2JdwvnR,Ariana Grande,https://open.spotify.com/artist/66CXWjxzNUsdJxJ2JdwvnR,https://i.scdn.co/image/ab6761610000e5eb68412f2d0177a9ebc265ff58
-5cj0lLjcoR7YOSnhnX0Po5,Doja Cat,https://open.spotify.com/artist/5cj0lLjcoR7YOSnhnX0Po5,https://i.scdn.co/image/ab6761610000e5eb8a0644455ebfa7d3976f5101
-6M2wZ9GZgrQXHCFfjv46we,Dua Lipa,https://open.spotify.com/artist/6M2wZ9GZgrQXHCFfjv46we,https://i.scdn.co/image/ab6761610000e5eb0c68f6c95232e716f0abee8d
-1mYsTxnqsietFxj1OgoGbG,A.R. Rahman,https://open.spotify.com/artist/1mYsTxnqsietFxj1OgoGbG,https://i.scdn.co/image/ab6761610000e5ebb19af0ea736c6228d6eb539c
-0LcJLqbBmaGUft1e9Mm8HV,ABBA,https://open.spotify.com/artist/0LcJLqbBmaGUft1e9Mm8HV,https://i.scdn.co/image/ab6761610000e5eb144d2bd5d672fcb0f38be00b
+Rank,Artist ID,Artist Name,Time Range
+1,6KImCVD70vtIoJWnq6nGn3,Harry Styles,medium_term
+2,06HL4z0CvFAxyc27GXpf02,Taylor Swift,medium_term
+3,1McMsnEElThX1knmY4oliG,Olivia Rodrigo,medium_term
+4,4AK6F7OLvEQ5QYCBNiQWHq,One Direction,medium_term
+5,1wRPtKGflJrBx9BmLsSwlU,Pritam,medium_term
+6,74KM79TiuVKeVCqs8QtB0B,Sabrina Carpenter,medium_term
+7,6Mv8GjQa7LKUGCAqa9qqdb,Vishal-Shekhar,medium_term
+8,3mIj9lX2MWuHmhNCA7LSCW,The 1975,medium_term
+9,6qqNVTkY8uBg9cP3Jd7DAH,Billie Eilish,medium_term
+10,1uNFoZAHBGtllmzznpCI3s,Justin Bieber,medium_term
+11,66CXWjxzNUsdJxJ2JdwvnR,Ariana Grande,medium_term
+12,5cj0lLjcoR7YOSnhnX0Po5,Doja Cat,medium_term
+13,6M2wZ9GZgrQXHCFfjv46we,Dua Lipa,medium_term
+14,1mYsTxnqsietFxj1OgoGbG,A.R. Rahman,medium_term
+15,0LcJLqbBmaGUft1e9Mm8HV,ABBA,medium_term

@@ -2,77 +2,66 @@ import pandas as pd
 from pathlib import Path
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 RAW_FOLDER = PROJECT_ROOT / "data" / "raw"
 
 RAW_FOLDER.mkdir(parents=True, exist_ok=True)
 
 
-def save_csv(df, filename):
-    path = RAW_FOLDER / filename
-    df.to_csv(path, index=False)
-    print(f"Saved {filename}")
-
-
 def extract_top_tracks(sp):
 
-    print("Extracting Top Tracks...")
+    time_ranges = {
+        "short_term": "4 Weeks",
+        "medium_term": "6 Months",
+        "long_term": "All Time"
+    }
 
-    results = sp.current_user_top_tracks(
-        limit=50,
-        time_range="medium_term"
-    )
+    for time_range, label in time_ranges.items():
 
-    rows = []
+        print(f"Extracting Top Tracks — {label}...")
 
-    for track in results["items"]:
+        results = sp.current_user_top_tracks(
+            limit=50,
+            time_range=time_range
+        )
 
-        rows.append({
+        rows = []
 
-    "Track ID": track["id"],
+        for rank, track in enumerate(
+            results["items"],
+            start=1
+        ):
 
-    "Track Name": track["name"],
+            artists = ", ".join(
+                artist["name"]
+                for artist in track.get("artists", [])
+            )
 
-    "Album ID": track["album"].get("id", ""),
+            rows.append({
+                "Rank": rank,
+                "Track ID": track.get("id"),
+                "Track Name": track.get("name"),
+                "Artists": artists,
+                "Album": track.get("album", {}).get("name"),
+                "Duration (ms)": track.get("duration_ms"),
+                "Time Range": time_range
+            })
 
-    "Album": track["album"]["name"],
+        df = pd.DataFrame(rows)
 
-    "Album Type": track["album"].get("album_type", ""),
+        output_file = (
+            RAW_FOLDER /
+            f"top_tracks_{time_range}.csv"
+        )
 
-    "Release Date": track["album"].get("release_date", ""),
+        df.to_csv(
+            output_file,
+            index=False
+        )
 
-    "Popularity": track.get("popularity", 0),
+        print(
+            f"Saved {output_file.name} "
+            f"({len(df)} tracks)"
+        )
 
-    "Artist IDs": ",".join(
-        artist["id"]
-        for artist in track["artists"]
-    ),
-
-    "Artists": ", ".join(
-        artist["name"]
-        for artist in track["artists"]
-    ),
-
-    "Duration_ms": track["duration_ms"],
-
-    "Explicit": track["explicit"],
-
-    "Track Number": track["track_number"],
-
-    "Disc Number": track["disc_number"],
-
-    "Preview URL": track.get("preview_url", ""),
-
-    "Spotify URL": track["external_urls"].get("spotify", ""),
-    "URI": track.get("uri", ""),
-    "Is Local": track.get("is_local", False),
-
-})
-
-    df = pd.DataFrame(rows)
-
-    save_csv(df, "top_tracks.csv")
-
-    print("✓ Top Tracks extracted")
-
-    return df
+    print("✓ Top Tracks extraction completed")

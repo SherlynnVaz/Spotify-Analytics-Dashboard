@@ -1,47 +1,67 @@
 import pandas as pd
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 RAW_FOLDER = PROJECT_ROOT / "data" / "raw"
 
 RAW_FOLDER.mkdir(parents=True, exist_ok=True)
 
 
-def save_csv(df, filename):
-    path = RAW_FOLDER / filename
-    df.to_csv(path, index=False)
-    print(f"Saved {filename}")
-
-
 def extract_top_artists(sp):
 
-    print("Extracting Top Artists...")
+    time_ranges = {
+        "short_term": "4 Weeks",
+        "medium_term": "6 Months",
+        "long_term": "All Time"
+    }
 
-    results = sp.current_user_top_artists(limit=50)
+    for time_range, label in time_ranges.items():
 
-    rows = []
+        print(f"Extracting Top Artists — {label}...")
 
-    for artist in results["items"]:
+        results = sp.current_user_top_artists(
+            limit=50,
+            time_range=time_range
+        )
 
-        image = ""
+        rows = []
 
-        if artist.get("images"):
-            image = artist["images"][0].get("url", "")
+        for rank, artist in enumerate(
+            results["items"],
+            start=1
+        ):
 
-        rows.append({
-            "Artist ID": artist["id"],
-            "Artist Name": artist["name"],
-            "Genres": ", ".join(artist.get("genres", [])),
-            "Followers": artist.get("followers", {}).get("total", 0),
-            "Popularity": artist.get("popularity", 0),
-            "Spotify URL": artist.get("external_urls", {}).get("spotify", ""),
-            "Image": image
-        })
+            genres = ", ".join(
+                artist.get("genres", [])
+            )
 
-    df = pd.DataFrame(rows)
+            rows.append({
+                "Rank": rank,
+                "Artist ID": artist.get("id"),
+                "Artist Name": artist.get("name"),
+                "Genres": genres,
+                "Followers": artist.get(
+                    "followers", {}
+                ).get("total"),
+                "Time Range": time_range
+            })
 
-    save_csv(df, "top_artists.csv")
+        df = pd.DataFrame(rows)
 
-    print("✓ Top Artists extracted")
+        output_file = (
+            RAW_FOLDER /
+            f"top_artists_{time_range}.csv"
+        )
 
-    return df
+        df.to_csv(
+            output_file,
+            index=False
+        )
+
+        print(
+            f"Saved {output_file.name} "
+            f"({len(df)} artists)"
+        )
+
+    print("✓ Top Artists extraction completed")
