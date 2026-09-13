@@ -231,30 +231,30 @@ function AnalyticsDashboard({ analytics, topTracks, topArtists }) {
     { label: "Clean", value: Math.max((summary.tracks || 1) - Math.round((summary.explicit_percent / 100) * (summary.tracks || 1)), 0) },
   ];
 
-const artistImages = Object.fromEntries(
-  topArtists.map((artist) => [artist.name, artist.image_url])
-);
-
-const featuredTrack = topTracks[0];
-
-const featuredArtist =
-  topArtists.find(
-    (artist) => artist.artist_id === featuredTrack?.artist_id
+  const artistImages = Object.fromEntries(
+    topArtists.map((artist) => [artist.name, artist.image_url])
   );
 
-const featuredArtistId =
-  featuredTrack?.artist_id ||
-  featuredArtist?.artist_id ||
-  null;
+  const featuredTrack = topTracks[0];
 
-const featuredArtistName =
-  featuredTrack?.artist?.split(",")[0]?.trim() ||
-  featuredArtist?.name ||
-  "";
+  const featuredArtist =
+    topArtists.find(
+      (artist) => artist.artist_id === featuredTrack?.artist_id
+    );
 
-const featuredArtistImage = featuredArtistId
-  ? `${API_URL}/artwork/artist/${featuredArtistId}`
-  : null;
+  const featuredArtistId =
+    featuredTrack?.artist_id ||
+    featuredArtist?.artist_id ||
+    null;
+
+  const featuredArtistName =
+    featuredTrack?.artist?.split(",")[0]?.trim() ||
+    featuredArtist?.name ||
+    "";
+
+  const featuredArtistImage = featuredArtistId
+    ? `${API_URL}/artwork/artist/${featuredArtistId}`
+    : null;
 
   return (
     <section className="analytics-workspace">
