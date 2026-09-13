@@ -1,8 +1,22 @@
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+
 
 load_dotenv()
 
-CLIENT_ID = os.getenv("CLIENT_ID", "").strip()
-CLIENT_SECRET = os.getenv("CLIENT_SECRET", "").strip()
-REDIRECT_URI = os.getenv("REDIRECT_URI", "").strip()
+
+CLIENT_ID = os.getenv(
+    "SPOTIFY_CLIENT_ID",
+    ""
+)
+
+CLIENT_SECRET = os.getenv(
+    "SPOTIFY_CLIENT_SECRET",
+    ""
+)
+
+REDIRECT_URI = os.getenv(
+    "SPOTIFY_REDIRECT_URI",
+    ""
+)

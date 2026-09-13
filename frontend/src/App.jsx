@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
 const API_URL = "http://127.0.0.1:8000";
@@ -234,13 +234,26 @@ function AnalyticsDashboard({ analytics, topTracks, topArtists }) {
     topArtists.map((artist) => [artist.name, artist.image_url])
   );
   const featuredTrack = topTracks[0];
-  const featuredArtist = topArtists.find((artist) => (
-    featuredTrack?.artist
-      ?.split(",")
-      .map((name) => name.trim())
-      .includes(artist.name)
-  )) || topArtists[0];
-  const featuredArtistImage = featuredTrack?.artist_image_url || featuredArtist?.image_url;
+  const trackArtistNames = (featuredTrack?.artist || "")
+  .split(",")
+  .map((name) => name.trim().toLowerCase())
+  .filter(Boolean);
+
+const featuredArtist =
+    topArtists.find(
+      (artist) => artist.artist_id === featuredTrack?.artist_id
+    ) ||
+    topArtists.find(
+      (artist) =>
+        trackArtistNames.includes(
+          (artist.name || "").trim().toLowerCase()
+        )
+    );
+
+  const featuredArtistImage =
+    featuredTrack?.artist_image_url ||
+    featuredArtist?.image_url ||
+    null;
 
   return (
     <section className="analytics-workspace">
@@ -392,12 +405,45 @@ function App() {
 
   const [loading, setLoading] = useState(true);
   const [connecting, setConnecting] = useState(false);
+  const dashboardRequest = useRef(0);
 
   useEffect(() => {
     loadDashboard(timeRange);
   }, [timeRange]);
 
+  useEffect(() => {
+    if (!user) return;
+
+    const interval = setInterval(() => {
+      refreshRecentlyPlayed();
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [user]);
+
+  async function refreshRecentlyPlayed() {
+    try {
+      const response = await fetch(
+        `${API_URL}/recently-played`,
+        {
+          credentials: "include",
+          cache: "no-store",
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.recently_played) {
+        setRecentlyPlayed(data.recently_played);
+      }
+    } catch (error) {
+      console.error("Recently played refresh error:", error);
+    }
+  }
+
   async function loadDashboard(selectedRange) {
+    const requestId = ++dashboardRequest.current;
+
     try {
       const [
         userResponse,
@@ -406,11 +452,21 @@ function App() {
         recentResponse,
         analyticsResponse,
       ] = await Promise.all([
-        fetch(`${API_URL}/me`),
-        fetch(`${API_URL}/top-tracks?time_range=${selectedRange}`),
-        fetch(`${API_URL}/top-artists?time_range=${selectedRange}`),
-        fetch(`${API_URL}/recently-played`),
-        fetch(`${API_URL}/analytics?time_range=${selectedRange}`),
+        fetch(`${API_URL}/me`, {
+          credentials: "include",
+        }),
+        fetch(`${API_URL}/top-tracks?time_range=${selectedRange}`, {
+          credentials: "include",
+        }),
+        fetch(`${API_URL}/top-artists?time_range=${selectedRange}`, {
+          credentials: "include",
+        }),
+        fetch(`${API_URL}/recently-played`, {
+          credentials: "include",
+        }),
+        fetch(`${API_URL}/analytics?time_range=${selectedRange}`, {
+          credentials: "include",
+        }),
       ]);
 
       const userData = await userResponse.json();
@@ -418,6 +474,10 @@ function App() {
       const artistsData = await artistsResponse.json();
       const recentData = await recentResponse.json();
       const analyticsData = await analyticsResponse.json();
+
+      if (requestId !== dashboardRequest.current) {
+        return;
+      }
 
       if (userData.authenticated) {
         setUser(userData.user);
